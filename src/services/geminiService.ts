@@ -66,18 +66,20 @@ export const generateFashionImage = async (
       },
     });
 
-    // Find the image part in the response
-    // FIX: Removed unnecessary optional chaining as response structure is guaranteed on success.
-    for (const part of response.candidates[0].content.parts) {
-      if (part.inlineData && typeof part.inlineData.data === 'string' && typeof part.inlineData.mimeType === 'string') {
-        const base64ImageBytes = part.inlineData.data;
-        const mimeType = part.inlineData.mimeType;
-        return `data:${mimeType};base64,${base64ImageBytes}`;
+    // Safely access the first candidate and its parts
+    const candidate = response.candidates?.[0];
+    if (candidate && candidate.content && candidate.content.parts) {
+      for (const part of candidate.content.parts) {
+        if (part.inlineData && typeof part.inlineData.data === 'string' && typeof part.inlineData.mimeType === 'string') {
+          const base64ImageBytes = part.inlineData.data;
+          const mimeType = part.inlineData.mimeType;
+          return `data:${mimeType};base64,${base64ImageBytes}`;
+        }
       }
     }
 
+
     // Check for a text-only response if no image is found
-    // FIX: Access response.text directly as per guidelines.
     const textResponse = response.text.trim();
     if (textResponse) {
       throw new Error(`The model returned a text response instead of an image: "${textResponse}"`);
@@ -134,16 +136,18 @@ export const enhanceImage = async (base64ImageDataUri: string): Promise<string> 
       },
     });
     
-    // FIX: Removed unnecessary optional chaining.
-    for (const part of response.candidates[0].content.parts) {
-      if (part.inlineData && typeof part.inlineData.data === 'string' && typeof part.inlineData.mimeType === 'string') {
-        const base64ImageBytes = part.inlineData.data;
-        const responseMimeType = part.inlineData.mimeType;
-        return `data:${responseMimeType};base64,${base64ImageBytes}`;
+    // Safely access the first candidate and its parts
+    const candidate = response.candidates?.[0];
+    if (candidate && candidate.content && candidate.content.parts) {
+      for (const part of candidate.content.parts) {
+        if (part.inlineData && typeof part.inlineData.data === 'string' && typeof part.inlineData.mimeType === 'string') {
+          const base64ImageBytes = part.inlineData.data;
+          const responseMimeType = part.inlineData.mimeType;
+          return `data:${responseMimeType};base64,${base64ImageBytes}`;
+        }
       }
     }
     
-    // FIX: Access response.text directly as per guidelines.
     const textResponse = response.text.trim();
     if (textResponse) {
       throw new Error(`The enhancement model returned text instead of an image: "${textResponse}"`);
