@@ -1,11 +1,11 @@
 import { GoogleGenAI, Modality } from "@google/genai";
 
-// Fix: Per coding guidelines, API key must be read from process.env.API_KEY.
-if (!process.env.API_KEY) {
-    throw new Error("API_KEY environment variable is not set.");
+// Fix: Per coding guidelines, API key must be read from process.env.REACT_APP_API_KEY for Create React App.
+if (!process.env.REACT_APP_API_KEY) {
+    throw new Error("REACT_APP_API_KEY environment variable is not set.");
 }
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+const ai = new GoogleGenAI({ apiKey: process.env.REACT_APP_API_KEY });
 
 // Helper function to convert File object to a base64 string
 const fileToInlineData = async (file: File): Promise<{mimeType: string, data: string}> => {
