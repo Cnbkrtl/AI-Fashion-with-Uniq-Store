@@ -1,11 +1,12 @@
 import { GoogleGenAI, Modality } from "@google/genai";
 
-// Fix: Per coding guidelines, API key must be read from process.env.REACT_APP_API_KEY for Create React App.
-if (!process.env.REACT_APP_API_KEY) {
-    throw new Error("REACT_APP_API_KEY environment variable is not set.");
-}
+// Export a flag to be checked by the UI to prevent app crashes.
+export const isApiKeySet = !!process.env.REACT_APP_API_KEY;
 
-const ai = new GoogleGenAI({ apiKey: process.env.REACT_APP_API_KEY });
+// Initialize the AI client. If the key is not set, API calls will fail later with a specific error,
+// but the app won't crash on startup. The UI check in App.tsx prevents this from being an issue.
+const ai = new GoogleGenAI({ apiKey: process.env.REACT_APP_API_KEY || "" });
+
 
 // Helper function to convert File object to a base64 string
 const fileToInlineData = async (file: File): Promise<{mimeType: string, data: string}> => {
@@ -34,6 +35,10 @@ export const generateFashionImage = async (
   imageFile: File,
   scenePrompt: string
 ): Promise<string> => {
+  if (!isApiKeySet) {
+    throw new Error('Invalid API Key. Please check your environment configuration.');
+  }
+
   const model = 'gemini-2.5-flash-image-preview';
 
   const imagePart = {
@@ -86,6 +91,10 @@ export const generateFashionImage = async (
 };
 
 export const enhanceImage = async (base64ImageDataUri: string): Promise<string> => {
+  if (!isApiKeySet) {
+    throw new Error('Invalid API Key. Please check your environment configuration.');
+  }
+  
   const model = 'gemini-2.5-flash-image-preview';
 
   const [header, data] = base64ImageDataUri.split(',');

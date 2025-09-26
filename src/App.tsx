@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { ImageUploader } from './components/ImageUploader';
 import { TextInput } from './components/TextInput';
 import { Spinner } from './components/Spinner';
-import { generateFashionImage, enhanceImage } from './services/geminiService';
+import { generateFashionImage, enhanceImage, isApiKeySet } from './services/geminiService';
 import { Header } from './components/Header';
 import { ImageDisplay } from './components/ImageDisplay';
 import { ExportModal, ColorGradingSettings, ResolutionSettings } from './components/ExportModal';
@@ -83,6 +83,23 @@ const getCanvasFilter = (settings: ColorGradingSettings): string => {
 
 
 const App: React.FC = () => {
+  // Graceful handling for missing API key to prevent app crash and show a helpful message.
+  if (!isApiKeySet) {
+    return (
+        <div className="min-h-screen bg-gray-900 text-gray-200 font-sans flex items-center justify-center p-4">
+            <div className="bg-gray-800 p-8 rounded-2xl shadow-lg max-w-lg text-center border border-red-500/50">
+                <h1 className="text-2xl font-bold text-red-400 mb-4">Configuration Error</h1>
+                <p className="text-gray-300 mb-4">
+                    The Google Gemini API key is missing. The application cannot function without it.
+                </p>
+                <p className="text-gray-400 text-sm">
+                    If you are the developer or administrator, please set the <code className="bg-gray-700 p-1 rounded text-cyan-400 text-xs">REACT_APP_API_KEY</code> environment variable before running the application.
+                </p>
+            </div>
+        </div>
+    );
+  }
+
   const [sourceImage, setSourceImage] = useState<File | null>(null);
   const [sourceImageUrl, setSourceImageUrl] = useState<string | null>(null);
   const [scenePrompt, setScenePrompt] = useState<string>('A woman standing confidently on a balcony overlooking the sea at sunset.');
