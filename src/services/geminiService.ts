@@ -1,11 +1,12 @@
-import { GoogleGenAI, Modality } from "@google/genai";
+import { GoogleGenAI, Modality, GenerateContentResponse } from "@google/genai";
 
-// Export a flag to be checked by the UI to prevent app crashes.
-export const isApiKeySet = !!process.env.REACT_APP_API_KEY;
+// FIX: Per coding guidelines, API key must be obtained from `process.env.API_KEY`.
+// The UI will check this flag to prevent API calls with a missing key.
+export const isApiKeySet = !!process.env.API_KEY;
 
-// Initialize the AI client. If the key is not set, API calls will fail later with a specific error,
-// but the app won't crash on startup. The UI check in App.tsx prevents this from being an issue.
-const ai = new GoogleGenAI({ apiKey: process.env.REACT_APP_API_KEY || "" });
+// FIX: Per coding guidelines, initialize with `process.env.API_KEY`.
+// The empty string fallback is for type safety, as the constructor expects a string.
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || "" });
 
 
 // Helper function to convert File object to a base64 string
@@ -36,7 +37,8 @@ export const generateFashionImage = async (
   scenePrompt: string
 ): Promise<string> => {
   if (!isApiKeySet) {
-    throw new Error('Invalid API Key. Please check your environment configuration.');
+    // FIX: Updated error message to reflect the correct environment variable.
+    throw new Error('API Key not configured. Please set the API_KEY environment variable.');
   }
 
   const model = 'gemini-2.5-flash-image-preview';
@@ -53,7 +55,7 @@ export const generateFashionImage = async (
   };
   
   try {
-    const response = await ai.models.generateContent({
+    const response: GenerateContentResponse = await ai.models.generateContent({
       model: model,
       contents: {
         parts: [imagePart, textPart],
@@ -65,7 +67,8 @@ export const generateFashionImage = async (
     });
 
     // Find the image part in the response
-    for (const part of response.candidates?.[0]?.content?.parts || []) {
+    // FIX: Removed unnecessary optional chaining as response structure is guaranteed on success.
+    for (const part of response.candidates[0].content.parts) {
       if (part.inlineData && typeof part.inlineData.data === 'string' && typeof part.inlineData.mimeType === 'string') {
         const base64ImageBytes = part.inlineData.data;
         const mimeType = part.inlineData.mimeType;
@@ -74,7 +77,8 @@ export const generateFashionImage = async (
     }
 
     // Check for a text-only response if no image is found
-    const textResponse = response.text?.trim();
+    // FIX: Access response.text directly as per guidelines.
+    const textResponse = response.text.trim();
     if (textResponse) {
       throw new Error(`The model returned a text response instead of an image: "${textResponse}"`);
     }
@@ -92,7 +96,8 @@ export const generateFashionImage = async (
 
 export const enhanceImage = async (base64ImageDataUri: string): Promise<string> => {
   if (!isApiKeySet) {
-    throw new Error('Invalid API Key. Please check your environment configuration.');
+    // FIX: Updated error message to reflect the correct environment variable.
+    throw new Error('API Key not configured. Please set the API_KEY environment variable.');
   }
   
   const model = 'gemini-2.5-flash-image-preview';
@@ -119,7 +124,7 @@ export const enhanceImage = async (base64ImageDataUri: string): Promise<string> 
   };
 
   try {
-    const response = await ai.models.generateContent({
+    const response: GenerateContentResponse = await ai.models.generateContent({
       model: model,
       contents: {
         parts: [imagePart, textPart],
@@ -128,8 +133,9 @@ export const enhanceImage = async (base64ImageDataUri: string): Promise<string> 
         responseModalities: [Modality.IMAGE, Modality.TEXT],
       },
     });
-
-    for (const part of response.candidates?.[0]?.content?.parts || []) {
+    
+    // FIX: Removed unnecessary optional chaining.
+    for (const part of response.candidates[0].content.parts) {
       if (part.inlineData && typeof part.inlineData.data === 'string' && typeof part.inlineData.mimeType === 'string') {
         const base64ImageBytes = part.inlineData.data;
         const responseMimeType = part.inlineData.mimeType;
@@ -137,7 +143,8 @@ export const enhanceImage = async (base64ImageDataUri: string): Promise<string> 
       }
     }
     
-    const textResponse = response.text?.trim();
+    // FIX: Access response.text directly as per guidelines.
+    const textResponse = response.text.trim();
     if (textResponse) {
       throw new Error(`The enhancement model returned text instead of an image: "${textResponse}"`);
     }
