@@ -29,7 +29,7 @@ This is a static React application and is best deployed on a platform like Verce
 
 3.  **Import Your GitHub Repository**:
     -   In the "Import Git Repository" section, find the repository you just forked and click **"Import"**.
-    -   Vercel will automatically detect that this is a Vite project. The default settings should be correct, so you don't need to change any build commands or directories.
+    -   **Important**: Under "Project Settings", ensure the **Framework Preset** is set to **`Vite`**. Vercel should detect this automatically, but it's crucial to verify. If it's set to something else (like "Create React App"), change it to `Vite`. The other build settings can be left as default.
 
 4.  **Add Your API Key**:
     -   Before deploying, you need to add your Google Gemini API Key as an environment variable.
