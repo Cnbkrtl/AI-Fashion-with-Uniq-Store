@@ -35,7 +35,7 @@ This is a static React application and is best deployed on a platform like Verce
     -   Before deploying, you need to add your Google Gemini API Key as an environment variable.
     -   Expand the **"Environment Variables"** section.
     -   Add a new variable:
-        -   **Name**: `VITE_API_KEY` (The `VITE_` prefix is required)
+        -   **Name**: `API_KEY`
         -   **Value**: Paste your Google Gemini API key here.
     -   Make sure the variable is available for all environments.
 
