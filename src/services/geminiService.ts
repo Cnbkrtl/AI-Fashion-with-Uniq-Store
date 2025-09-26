@@ -61,8 +61,8 @@ export const generateFashionImage = async (
 
     // Find the image part in the response
     for (const part of response.candidates?.[0]?.content?.parts || []) {
-      if (part.inlineData) {
-        const base64ImageBytes: string = part.inlineData.data;
+      if (part.inlineData && typeof part.inlineData.data === 'string' && typeof part.inlineData.mimeType === 'string') {
+        const base64ImageBytes = part.inlineData.data;
         const mimeType = part.inlineData.mimeType;
         return `data:${mimeType};base64,${base64ImageBytes}`;
       }
@@ -121,8 +121,8 @@ export const enhanceImage = async (base64ImageDataUri: string): Promise<string> 
     });
 
     for (const part of response.candidates?.[0]?.content?.parts || []) {
-      if (part.inlineData) {
-        const base64ImageBytes: string = part.inlineData.data;
+      if (part.inlineData && typeof part.inlineData.data === 'string' && typeof part.inlineData.mimeType === 'string') {
+        const base64ImageBytes = part.inlineData.data;
         const responseMimeType = part.inlineData.mimeType;
         return `data:${responseMimeType};base64,${base64ImageBytes}`;
       }
